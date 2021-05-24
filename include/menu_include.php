@@ -13,7 +13,7 @@
             <a href="index.php" id="orarend">Órarend</a>
         </li>
         <li class="menupont">
-        <a href="logout.php" id="menupont_kijelentkezes">Órarend</a>
+        <a href="logout.php" id="menupont_kijelentkezes">Kijelentkezés</a>
     </li>
     </ul>
 </div>
