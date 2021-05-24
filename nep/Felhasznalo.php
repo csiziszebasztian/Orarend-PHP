@@ -86,7 +86,7 @@
         private function betolt() {
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            if ($query = $mysqli->prepare("select nev, email,  from felhasznalok where id = ?")) {       
+            if ($query = $mysqli->prepare("select nev, email from felhasznalok where id = ?")) {       
                 $query->bind_param("i", $this->id);
                 $query->execute() ;
                 $query->store_result();
@@ -240,15 +240,15 @@
             $return = "" ;
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            if ($query = $mysqli->prepare("select id, nev, jelszo from felhasznalok where email = ?")) {
+            if ($query = $mysqli->prepare("select id, nev, jelszo, tanar, tantargy, szin from felhasznalok where email = ?")) {
                 $query->bind_param("s", $felhasznalo_email);
                 $query->execute() ;
                 $query->store_result();
                 if($query->num_rows > 0) {                    
-                    $query->bind_result($id, $nev, $jelszo_hash) ;
+                    $query->bind_result($id, $nev, $jelszo_hash, $tanar, $tantargy, $szin);
                     $query->fetch() ;
                     if (password_verify($felhasznalo_jelszo, $jelszo_hash)) {    
-                        $user = new Felhasznalo($nev, $felhasznalo_email, $felhasznalo_jelszo, $id) ;
+                        $user = new Felhasznalo($nev, $felhasznalo_email, $felhasznalo_jelszo, $tanar, $tantargy, $szin, $id) ;
                         $_SESSION["belepett_user"] = $user ;
                         $return = "" ;
                     }
