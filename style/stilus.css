@@ -1,0 +1,126 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 2019.02.15., 11:26:17
+    Author     : hatwagner
+*/
+table {
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+tr:nth-child(even) {
+    background: #CCC;
+}
+
+tr:nth-child(odd) {
+    background: #FFF;
+}
+
+td {
+    font-family: Arial;
+    border: 1px solid gray;
+}
+
+td.bal {
+    font-weight: bold;
+    width: 5cm;
+}
+
+td.jobb {
+    width: 10cm;
+}
+
+img {
+    max-width: 60px;
+}
+
+div.user_info {
+    background-color: lightgray;    
+    width: 100%;
+    color: black;
+    padding: 10px ;
+    font-weight: bold;
+}
+
+div.fomenu_befoglalo {
+    width: 100%;
+}
+
+ul.fomenu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgb(94, 94, 94);
+}
+  
+ul.fomenu li {
+    float: left;
+}
+  
+ul.fomenu li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+  
+ul.fomenu li a:hover {
+    background-color: rgb(34, 34, 34);
+}
+
+div.almenu_befoglalo {
+    margin-top: 30px;
+}
+
+div.almenu_befoglalo ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #f1f1f1;
+}
+  
+div.almenu_befoglalo ul li a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+div.almenu_befoglalo ul li a:hover {
+    background-color: #555;
+    color: white;
+}
+
+div.kereso_urlap {
+    margin: 10px;
+}
+
+div.input_mezo {
+    padding: 5px;
+    margin: 5px;
+}
+
+.hibauzenet {
+    color: red;
+}
+
+.sikeruzenet {
+    color: green;
+}
+
+div#kiadvany_reszletek_befoglalo {
+    margin-top: 10px;
+}
+
+div.reszletek_mezo {
+    padding: 10px;
+    margin: 4px 0px;    
+    background-color: lightgrey;
+}
