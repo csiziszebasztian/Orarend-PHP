@@ -29,7 +29,7 @@
         }
 
         public function getTanar() : bool {
-            return $this->tanar;
+            return (bool)$this->tanar;
         }
 
         public function getTantargy() : string {
@@ -66,7 +66,7 @@
         
         public function __construct(
             string $nev, string $email, string $password, 
-            bool $tanar, string $tantargy, string $color ,int $id = null) 
+            bool $tanar, string $tantargy=null, string $color=null,int $id = null) 
         {
             if (is_numeric($id)) {
                 $this->id = $id ;
@@ -86,13 +86,13 @@
         private function betolt() {
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            if ($query = $mysqli->prepare("select nev, email from felhasznalok where id = ?")) {       
+            if ($query = $mysqli->prepare("select nev, email, tanar, tantargy, szin from felhasznalok where id = ?")) {       
                 $query->bind_param("i", $this->id);
                 $query->execute() ;
                 $query->store_result();
                 if($query->num_rows > 0) {
-                    $query->bind_result($this->nev, $this->email) ;
-                    $query->fetch() ;
+                    $query->bind_result($this->nev, $this->email, $this->tanar, $this->tantargy, $this->szin);
+                    $query->fetch();
                 }
                 else
                 {
@@ -248,7 +248,7 @@
                     $query->bind_result($id, $nev, $jelszo_hash, $tanar, $tantargy, $szin);
                     $query->fetch() ;
                     if (password_verify($felhasznalo_jelszo, $jelszo_hash)) {    
-                        $user = new Felhasznalo($nev, $felhasznalo_email, $felhasznalo_jelszo, $tanar, $tantargy, $szin, $id) ;
+                        $user = new Felhasznalo($nev, $felhasznalo_email, $felhasznalo_jelszo, (bool)$tanar, $tantargy, $szin, $id) ;
                         $_SESSION["belepett_user"] = $user ;
                         $return = "" ;
                     }

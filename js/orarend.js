@@ -1,4 +1,4 @@
-/*$(document).ready(function() {
+$(document).ready(function() {
   $("#tipus_select").on("change", function() {
     $(".plusz_mezok").hide() ;
     switch ($(this).val()) {
@@ -256,4 +256,4 @@ function felhasznalo_kereses() {
       $("#felhasznalok_lista").find("table").append('<tr><td>' + felhasznalo.id + '</td><td>' + felhasznalo.nev + '</td><td>' + felhasznalo.email + '</td><td><input type="button" name="modosit" id="modosit_' + felhasznalo.id + '" class="felhasznalo_modosit_gomb" value="Módosítás"></td><td><input type="button" name="torol" id="torol_' + felhasznalo.id + '" class="felhasznalo_torol_gomb" value="Törlés"></td></tr>') ;
     })
   })
-}*/
+}

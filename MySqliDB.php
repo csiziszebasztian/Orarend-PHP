@@ -9,7 +9,7 @@
     private $_host = "localhost";
     private $_username = "root";
     private $_password = "L%NUPrtl621";
-    private $_database = "egyetem_orarend_alkalmazas";
+    private $_database = "egyetem_orarend";
   
     /*
     Visszaadja az adatbázis objektum példányát, ez a metódus példányosítás nélkül hívható

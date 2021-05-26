@@ -4,7 +4,7 @@
 <div class="fomenu_befoglalo">
     <ul class="fomenu">
     <?php
-        if($_SESSION["belepett_use"]->getTanar()){
+        if($_SESSION["belepett_user"]->getTanar()){
         echo '<li class="menupont"> <a href="users.php" id="felhasznalok_kezelese">Felhasználók kezelése</a></li>';
         echo '<li class="menupont"> <a href="orarendkezel.php" id="orarend_kezelese">Órarend kezelése</a></li>';
         }

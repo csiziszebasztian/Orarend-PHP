@@ -1,6 +1,7 @@
 <?php
+    ini_set('display_errors', 1);
     require_once("include/common_include.php") ;
-
+    
     $hibauzenet = "" ;
     if (filter_has_var(INPUT_POST, 'bejelentkezes') && $_POST["bejelentkezes"] == "Bejelentkezés") {
         if (!filter_has_var(INPUT_POST, "email") || !$felhasznalo_email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL)) {
@@ -13,8 +14,8 @@
             try {        
                     $belepes_hiba = nep\Felhasznalo::bejelentkezes($felhasznalo_email, $felhasznalo_jelszo) ;
                     if ($belepes_hiba == "") {
-                        header('Location: index.php');
-                        exit;                        
+                        header('Location: index.php') ; 
+                        exit;                     
                     }
                     else
                     {
