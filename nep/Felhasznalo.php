@@ -183,9 +183,7 @@
             return $str;
         }
 
-        //Annak ellenőrzésére szolgáló metódus, amellyel le tudjuk kérdezni, van-e már felhasználó a rendszerben az adott e-mail címmel
-        //Ha van megadva felhasznalo_id, akkor az adott id-t kiszűrve ellenőrzünk (adatmódosításnál engednünk kell a saját e-mail címével való mentést).
-        //Ha van, a visszatérési érték true
+       
         public static function emailFoglaltsagEllenorzes(string $email, int $felhasznalo_id = null) {
             $return = false ;
             $db = \MySqliDB::getInstance();

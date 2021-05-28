@@ -10,7 +10,7 @@
         if (!filter_has_var(INPUT_POST, "email") || !$felhasznalo_email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL)) {
             $hibauzenet .= "Nincs megadva, vagy hibás a felhasználó e-mail címe.<br />" ;
         }
-        else if (lib\Felhasznalo::emailFoglaltsagEllenorzes($felhasznalo_email)) {
+        else if (nep\Felhasznalo::emailFoglaltsagEllenorzes($felhasznalo_email)) {
             $hibauzenet .= "Ezzel az e-mail címmel már van felvéve felhasználó.<br />" ;
         }
         if (!filter_has_var(INPUT_POST, "jelszo") || !$felhasznalo_jelszo = filter_input(INPUT_POST, "jelszo")) {
@@ -27,7 +27,7 @@
         }
         if ($hibauzenet == "") {
             try {
-                    $felhasznalo = new lib\Felhasznalo($felhasznalo_nev, $felhasznalo_email, $felhasznalo_jelszo);
+                    $felhasznalo = new nep\Felhasznalo($felhasznalo_nev, $felhasznalo_email, $felhasznalo_jelszo);
                     $felhasznalo->mentes() ;
             }
             catch (Exception $e) {
@@ -55,7 +55,7 @@
         if (!filter_has_var(INPUT_POST, "email") || !$felhasznalo_email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL)) {
             $hibauzenet .= "Nincs megadva, vagy hibás a felhasználó e-mail címe.<br />" ;
         }
-        else if (lib\Felhasznalo::emailFoglaltsagEllenorzes($felhasznalo_email, $felhasznalo_id)) {
+        else if (nep\Felhasznalo::emailFoglaltsagEllenorzes($felhasznalo_email, $felhasznalo_id)) {
             $hibauzenet .= "Ezzel az e-mail címmel már van felvéve felhasználó.<br />" ;
         }
         $felhasznalo_jelszo = "" ;
@@ -75,7 +75,7 @@
         }
         if ($hibauzenet == "") {
             try {
-                    $felhasznalo = new lib\Felhasznalo("", "", "", $felhasznalo_id);
+                    $felhasznalo = new nep\Felhasznalo("", "", "", $felhasznalo_id);
                     $felhasznalo->setNev($felhasznalo_nev) ;
                     $felhasznalo->setEmail($felhasznalo_email) ;
                     if ($felhasznalo_jelszo != "") {
@@ -103,7 +103,7 @@
         }
         if ($hibauzenet == "") {
             try {
-                    $felhasznalo = new lib\Felhasznalo("", "", "", $felhasznalo_id);
+                    $felhasznalo = new nep\Felhasznalo("", "", "", $felhasznalo_id);
                     $felhasznalo->torles() ;
             }
             catch (Exception $e) {
@@ -121,23 +121,23 @@
     else if (filter_has_var(INPUT_POST, 'felhasznalo_kereses') && $_POST["felhasznalo_kereses"] == "1") {
         if (filter_has_var(INPUT_POST, 'id')) {
             $keresett_id = filter_input(INPUT_POST, "id") ;
-            $felhasznalok = lib\Felhasznalo::felhasznalokListaja(array("id"=>$keresett_id)) ;
+            $felhasznalok = nep\Felhasznalo::felhasznalokListaja(array("id"=>$keresett_id)) ;
         }
         else
         {
-            $felhasznalok = lib\Felhasznalo::felhasznalokListaja() ;
+            $felhasznalok = nep\Felhasznalo::felhasznalokListaja() ;
         }
         die(json_encode($felhasznalok)) ;
     }
     else {
-        $felhasznalok = lib\Felhasznalo::felhasznalokListaja() ;
+        $felhasznalok = nep\Felhasznalo::felhasznalokListaja() ;
     }
 ?>
 
 <html>
     <head>
         <title>
-            Könyvtár példa - bővített :: Felhasználók kezelése
+            Órarend alkalmazás
         </title>
         <meta charset="utf-8" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
