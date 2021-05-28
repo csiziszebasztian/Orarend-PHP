@@ -37,13 +37,13 @@
             Órarend alkalmazás
         </title>
         <meta charset="utf-8" />
-        <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="js/konyvtar.js"></script>-->      
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="js/orarend.js"></script>      
         <link rel='stylesheet' href="style/stilus.css" type='text/css' media='all' />     
 
-        <!-- A részletes oldalt megjelenítő modal ablakhoz az alábbi két sor 
+        <!-- A részletes oldalt megjelenítő modal ablakhoz az alábbi két sor -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" /> -->    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" /> 
     </head>
 <body>
 <?php

@@ -4,16 +4,16 @@
     namespace nep;
     
     class Felhasznalo {
-        private $nev;
+        private $name;
         private $email;
         private $password;
         private $id;
-        private $tanar;
-        private $tantargy;
+        private $role;
+        private $subject;
         private $color;
         
-        public function getNev() : string {
-            return $this->nev;
+        public function getName() : string {
+            return $this->name;
         }
 
         public function getEmail() : string {
@@ -28,20 +28,20 @@
             return $this->id;
         }
 
-        public function getTanar() : bool {
-            return (bool)$this->tanar;
+        public function getRole() : string {
+            return $this->role;
         }
 
-        public function getTantargy() : string {
-            return $this->tantargy;
+        public function getSubject() : string {
+            return $this->subject;
         }
 
         public function getColor() : string {
             return $this->color;
         }
 
-        public function setNev(string $nev) {
-            $this->nev = $nev;
+        public function setName(string $name) {
+            $this->name = $name;
         }
 
         public function setEmail(string $email) {
@@ -52,12 +52,12 @@
             $this->password = $password;
         }
 
-        public function setTanar(bool $tanar) {
-            $this->tanar = $tanar;
+        public function setRole(string $role) {
+            $this->role = $role;
         }
 
-        public function setTantargy(string $tantargy) {
-            $this->tantargy = $tantargy;
+        public function setSubject(string $subject) {
+            $this->subject = $subject;
         }
 
         public function setColor(string $color) {
@@ -65,8 +65,8 @@
         }
         
         public function __construct(
-            string $nev, string $email, string $password, 
-            bool $tanar, string $tantargy=null, string $color=null,int $id = null) 
+            string $name, string $email, string $password, 
+            string $role, string $subject=null, string $color=null,int $id = null) 
         {
             if (is_numeric($id)) {
                 $this->id = $id ;
@@ -74,11 +74,11 @@
             }
             else
             {
-                $this->nev = $nev;
+                $this->name = $name;
                 $this->email = $email;
                 $this->password = $password;
-                $this->tantargy = $tantargy;
-                $this->tanar = $tanar;
+                $this->subject = $subject;
+                $this->role = $role;
                 $this->color = $color;
             }
         }
@@ -86,12 +86,12 @@
         private function betolt() {
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            if ($query = $mysqli->prepare("select nev, email, tanar, tantargy, szin from felhasznalok where id = ?")) {       
+            if ($query = $mysqli->prepare("select nev, email, szerep, tantargy, szin from felhasznalok where id = ?")) {       
                 $query->bind_param("i", $this->id);
                 $query->execute() ;
                 $query->store_result();
                 if($query->num_rows > 0) {
-                    $query->bind_result($this->nev, $this->email, $this->tanar, $this->tantargy, $this->szin);
+                    $query->bind_result($this->name, $this->email, $this->role, $this->subject, $this->szin);
                     $query->fetch();
                 }
                 else
@@ -117,9 +117,9 @@
                 if ($this->password != "") {
                     $jelszo_sql = ", jelszo = '" . password_hash($this->password, PASSWORD_DEFAULT) . "'" ;
                 }
-                $sql = "update felhasznalok set nev = ?, email = ? " . $jelszo_sql . " where id = ?" ;
+                $sql = "update felhasznalok set nev = ?, email = ? " . $jelszo_sql . " szerep=?, tantargy=?, szin=? where id = ?" ;
                 if ($query = $mysqli->prepare($sql)) {
-                    $query->bind_param("ssi", $this->nev, $this->email, $this->id);
+                    $query->bind_param("ssssi", $this->name, $this->email, $this->role, $this->subject, $this->color, $this->id);
                     if(!$query->execute()) {
                         throw new \Exception("Felhasználó adatok frissítése sikertelen.");
                     }
@@ -132,9 +132,9 @@
             }
             else
             {
-                if ($query = $mysqli->prepare("insert into felhasznalok (nev, email, jelszo) values (?, ?, ?)")) {
+                if ($query = $mysqli->prepare("insert into felhasznalok (nev, email, jelszo, szerep, tantargy, szin) values (?, ?, ?, ?, ?, ?)")) {
                     $jelszo_kodolt = password_hash($this->password, PASSWORD_DEFAULT) ;
-                    $query->bind_param("sss", $this->nev, $this->email, $jelszo_kodolt);
+                    $query->bind_param("sssss", $this->name, $this->email, $jelszo_kodolt, $this->role, $this->subject, $this->color);
                     if(!$query->execute()  || $query->affected_rows == 0) {
                         throw new \Exception("Felhasználó felvétele sikertelen.");
                     }
@@ -177,7 +177,7 @@
         }
                 
         public function __toString() : string {
-            $str = "<pre>Name: ".$this->nev.
+            $str = "<pre>Name: ".$this->name.
                    "\nE-mail: ".$this->email ;
             $str .= "</pre>\n";
             return $str;
@@ -215,15 +215,15 @@
             $where_query = "" ;
             if (is_array($keresesi_opciok)) {
                 $where_query = "where 1 = 1 " ;                
-                foreach ($keresesi_opciok as $opcio_nev => $opcio_ertek) {                    
-                    switch ($opcio_nev) {
+                foreach ($keresesi_opciok as $opcio_name => $opcio_ertek) {                    
+                    switch ($opcio_name) {
                         case "id": 
-                            $where_query .= " and $opcio_nev = $opcio_ertek " ;
+                            $where_query .= " and $opcio_name = $opcio_ertek " ;
                             break ;
                     }                    
                 }
             }
-            if ($result = $mysqli->query("select id, nev, email from felhasznalok " . $where_query . " order by nev")) {
+            if ($result = $mysqli->query("select id, nev, email, szerep, tantargy, szin from felhasznalok " . $where_query . " order by nev")) {
                 while ($sor = $result->fetch_assoc()) {
                     $return[] = $sor ;
                 }
@@ -238,15 +238,15 @@
             $return = "" ;
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            if ($query = $mysqli->prepare("select id, nev, jelszo, tanar, tantargy, szin from felhasznalok where email = ?")) {
+            if ($query = $mysqli->prepare("select id, nev, jelszo, szerep, tantargy, szin from felhasznalok where email = ?")) {
                 $query->bind_param("s", $felhasznalo_email);
                 $query->execute() ;
                 $query->store_result();
                 if($query->num_rows > 0) {                    
-                    $query->bind_result($id, $nev, $jelszo_hash, $tanar, $tantargy, $szin);
+                    $query->bind_result($id, $name, $jelszo_hash, $role, $subject, $szin);
                     $query->fetch() ;
                     if (password_verify($felhasznalo_jelszo, $jelszo_hash)) {    
-                        $user = new Felhasznalo($nev, $felhasznalo_email, $felhasznalo_jelszo, (bool)$tanar, $tantargy, $szin, $id) ;
+                        $user = new Felhasznalo($name, $felhasznalo_email, $felhasznalo_jelszo, $role, $subject, $szin, $id) ;
                         $_SESSION["belepett_user"] = $user ;
                         $return = "" ;
                     }

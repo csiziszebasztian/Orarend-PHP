@@ -3,7 +3,6 @@
 
     if (filter_has_var(INPUT_POST, 'felhasznalo_felvetel') && $_POST["felhasznalo_felvetel"] == "1") {
         $hibauzenet = "" ;
-        //Megpróbáljuk felvenni a felhasználót és visszaadjuk az üzenetet a sikerességről
         if (!filter_has_var(INPUT_POST, "nev") || !$felhasznalo_nev = filter_input(INPUT_POST, "nev")) {
             $hibauzenet .= "Nincs megadva a felhasználó neve.<br />" ;
         }
@@ -25,10 +24,19 @@
         else if ($felhasznalo_jelszo != $felhasznalo_jelszo_ismet) {
             $hibauzenet .= "A jelszónak és a jelszó ismét mezőnek egyeznie kell.<br />" ;
         }
+        if (!filter_has_var(INPUT_POST, "szerep") || !$kiadvany_szerep = filter_input(INPUT_POST, "szerep")) {
+            $hibauzenet .= "Nincs megadva a felhasználó szerepe.<br />" ;
+        }
         if ($hibauzenet == "") {
             try {
-                    $felhasznalo = new nep\Felhasznalo($felhasznalo_nev, $felhasznalo_email, $felhasznalo_jelszo);
-                    $felhasznalo->mentes() ;
+                    $felhasznalo_subject = filter_input(INPUT_POST, "tantargy") ;
+                    $felhasznalo_color = filter_input(INPUT_POST, "szin") ;
+                    $felhasznalo = new nep\Felhasznalo($felhasznalo_nev, $felhasznalo_email, $felhasznalo_jelszo, $kiadvany_szerep);
+                    if(isset($felhasznalo_subject)){
+                        $felhasznalo->setSubject($felhasznalo_subject);
+                        $felhasznalo->setColor($felhasznalo_color);
+                    }
+                    $felhasznalo->mentes();
             }
             catch (Exception $e) {
                 $hibauzenet = $e->getMessage() ;
@@ -42,7 +50,7 @@
             die($hibauzenet) ;
         }
     }
-    else if (filter_has_var(INPUT_POST, 'felhasznalo_modositas') && $_POST["felhasznalo_modositas"] == "1") {
+    /*else if (filter_has_var(INPUT_POST, 'felhasznalo_modositas') && $_POST["felhasznalo_modositas"] == "1") {
         //Megpróbáljuk módosítani a felhasználót és visszaadjuk az üzenetet a sikerességről
         $hibauzenet = "" ;
         //Megpróbáljuk felvenni a felhasználót és visszaadjuk az üzenetet a sikerességről
@@ -117,7 +125,7 @@
         {
             die($hibauzenet) ;
         }        
-    }
+    }*/
     else if (filter_has_var(INPUT_POST, 'felhasznalo_kereses') && $_POST["felhasznalo_kereses"] == "1") {
         if (filter_has_var(INPUT_POST, 'id')) {
             $keresett_id = filter_input(INPUT_POST, "id") ;
@@ -141,7 +149,7 @@
         </title>
         <meta charset="utf-8" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="js/konyvtar.js"></script>       
+        <script src="js/orarend.js"></script>       
         <link rel='stylesheet' href="style/stilus.css" type='text/css' media='all' />     
     </head>
     <body>
@@ -166,6 +174,20 @@
                         </div>
                         <div class="input_mezo">
                             Jelszó ismét: <input type="password" name="jelszo_ismet" id="jelszo_ismet_input" value="" required />*
+                        </div>
+                        <div class="input_mezo">
+                            Típusa: 
+                            <select name="tipus" id="tipus_select">
+                                <option value="">Kérem, válasszon</option>
+                                <option value="tanár">Tanár</option>
+                                <option value="diák">Diák</option>
+                            </select>
+                        </div>
+                        <div class="input_mezo plusz_mezok tanar_mezok" style="display:none;">
+                            Tantárgy: <input type="text" name="tantargy" id="tantargy_input" value="" />
+                        </div>
+                        <div class="input_mezo plusz_mezok tanar_mezok" style="display:none;">
+                            Szín: <input type="color" name="szin" id="szin_input" value="#e66465" />
                         </div>
                         <input type="button" name="mentes" id="felhasznalo_mentes_gomb" value="Mentés">   
                     </form>
