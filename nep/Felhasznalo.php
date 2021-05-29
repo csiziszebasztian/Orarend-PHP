@@ -134,7 +134,7 @@
             {
                 if ($query = $mysqli->prepare("insert into felhasznalok (nev, email, jelszo, szerep, tantargy, szin) values (?, ?, ?, ?, ?, ?)")) {
                     $jelszo_kodolt = password_hash($this->password, PASSWORD_DEFAULT) ;
-                    $query->bind_param("sssss", $this->name, $this->email, $jelszo_kodolt, $this->role, $this->subject, $this->color);
+                    $query->bind_param("ssssss", $this->name, $this->email, $jelszo_kodolt, $this->role, $this->subject, $this->color);
                     if(!$query->execute()  || $query->affected_rows == 0) {
                         throw new \Exception("Felhasználó felvétele sikertelen.");
                     }
@@ -178,7 +178,10 @@
                 
         public function __toString() : string {
             $str = "<pre>Name: ".$this->name.
-                   "\nE-mail: ".$this->email ;
+                   "\nE-mail: ".$this->email.
+                   "\nRole: ". $this->role. 
+                   "\nSubject: ". $this->subject. 
+                   "\nColor: ". $this->color;
             $str .= "</pre>\n";
             return $str;
         }

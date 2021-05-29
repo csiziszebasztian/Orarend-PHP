@@ -8,39 +8,39 @@ and open the template in the editor.
     Author     : hatwagner
 */
 
-/*table {
+table.list {
     border-collapse: collapse;
-    margin-bottom: 20px;
-    margin-top: 30px;
+    margin-bottom: 10px;
 }
 
-th {
-  font-size: 2rem;
-  font-weight: 400; 
-  height: 150px;
+table.list th, td{
+    text-align: center;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
-tr:nth-child(even) {
+table.list tr:nth-child(even) {
     background: #CCC;
 }
 
-tr:nth-child(odd) {
+table.list tr:nth-child(odd) {
     background: #FFF;
 }
 
-td {
+table.list td {
     font-family: Arial;
     border: 1px solid gray;
+
 }
 
-td.bal {
+table.list td.bal {
     font-weight: bold;
     width: 5cm;
 }
 
-td.jobb {
+table.list td.jobb {
     width: 10cm;
-}*/
+}
 
 img {
     max-width: 60px;

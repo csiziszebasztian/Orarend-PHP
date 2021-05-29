@@ -1,11 +1,10 @@
+
+//kész
 $(document).ready(function() {
-  $("#tipus_select").on("change", function() {
+  $("#szerep_select").on("change", function() {
     $(".plusz_mezok").hide() ;
-    switch ($(this).val()) {
-      case 'tankönyv': $(".tankonyv_mezok").show();
-        break ;
-      case 'magazin': $(".magazin_mezok").show();
-        break ;
+    if ($(this).val()==="tanár") {
+      $(".tanar_mezok").show();
     }
   }) ;
   
@@ -243,6 +242,8 @@ function kereses() {
   })
 }
 
+
+//kész
 function felhasznalo_kereses() {
   $.ajax({
     method: "POST",
@@ -251,9 +252,9 @@ function felhasznalo_kereses() {
     dataType: "json"
   })
   .done(function(valasz) {
-    $("#felhasznalok_lista").html('<table><tr><th colspan="6">A rendszerbe felvett felhasználók</th></tr><tr><th>ID</th><th>Név</th><th>E-mail cím</th><th>&nbsp;</th><th>&nbsp;</th></tr>') ;
+    $("#felhasznalok_lista").html('<table class="list"><tr><th colspan="6">A rendszerbe felvett felhasználók</th></tr><tr><th>ID</th><th>Név</th><th>E-mail cím</th><th>Szerepe</th><th>Tantárgy</th><th>Szín</th><th>&nbsp;</th><th>&nbsp;</th></tr>')
     $.each(valasz,function(index,felhasznalo){
-      $("#felhasznalok_lista").find("table").append('<tr><td>' + felhasznalo.id + '</td><td>' + felhasznalo.nev + '</td><td>' + felhasznalo.email + '</td><td><input type="button" name="modosit" id="modosit_' + felhasznalo.id + '" class="felhasznalo_modosit_gomb" value="Módosítás"></td><td><input type="button" name="torol" id="torol_' + felhasznalo.id + '" class="felhasznalo_torol_gomb" value="Törlés"></td></tr>') ;
+      $("#felhasznalok_lista").find("table").append('<tr><td>' + felhasznalo.id + '</td><td>' + felhasznalo.nev + '</td><td>' + felhasznalo.email + '</td><td>' + felhasznalo.role + '</td><td>' + '</td><td>' + felhasznalo.subject + '</td><td>' + '</td><td>' + felhasznalo.color + '</td><td>' + '</td><td><input type="button" name="modosit" id="modosit_' + felhasznalo.id + '" class="felhasznalo_modosit_gomb" value="Módosítás"></td><td><input type="button" name="torol" id="torol_' + felhasznalo.id + '" class="felhasznalo_torol_gomb" value="Törlés"></td></tr>') ;
     })
   })
 }

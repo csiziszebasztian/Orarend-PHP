@@ -1,4 +1,5 @@
 <?php
+    ini_set('display_errors', 1);
     require_once("include/common_include.php") ;
 
     if (filter_has_var(INPUT_POST, 'felhasznalo_felvetel') && $_POST["felhasznalo_felvetel"] == "1") {
@@ -24,15 +25,15 @@
         else if ($felhasznalo_jelszo != $felhasznalo_jelszo_ismet) {
             $hibauzenet .= "A jelszónak és a jelszó ismét mezőnek egyeznie kell.<br />" ;
         }
-        if (!filter_has_var(INPUT_POST, "szerep") || !$kiadvany_szerep = filter_input(INPUT_POST, "szerep")) {
+        if (!filter_has_var(INPUT_POST, "szerep") || !$felhasznalo_szerep = filter_input(INPUT_POST, "szerep")) {
             $hibauzenet .= "Nincs megadva a felhasználó szerepe.<br />" ;
         }
         if ($hibauzenet == "") {
             try {
                     $felhasznalo_subject = filter_input(INPUT_POST, "tantargy") ;
-                    $felhasznalo_color = filter_input(INPUT_POST, "szin") ;
-                    $felhasznalo = new nep\Felhasznalo($felhasznalo_nev, $felhasznalo_email, $felhasznalo_jelszo, $kiadvany_szerep);
-                    if(isset($felhasznalo_subject)){
+                    $felhasznalo_color = substr(filter_input(INPUT_POST, "szin"), 1) ;
+                    $felhasznalo = new nep\Felhasznalo($felhasznalo_nev, $felhasznalo_email, $felhasznalo_jelszo, $felhasznalo_szerep);
+                    if($felhasznalo_szerep==="tanár"){
                         $felhasznalo->setSubject($felhasznalo_subject);
                         $felhasznalo->setColor($felhasznalo_color);
                     }
@@ -176,8 +177,8 @@
                             Jelszó ismét: <input type="password" name="jelszo_ismet" id="jelszo_ismet_input" value="" required />*
                         </div>
                         <div class="input_mezo">
-                            Típusa: 
-                            <select name="tipus" id="tipus_select">
+                            Szerepe: 
+                            <select name="szerep" id="szerep_select">
                                 <option value="">Kérem, válasszon</option>
                                 <option value="tanár">Tanár</option>
                                 <option value="diák">Diák</option>
@@ -218,7 +219,7 @@
             <div>
                 <h3>Felhasználók listája</h3>
                 <div id="felhasznalok_lista">                                    
-                    <table>
+                    <table class="list">
                         <tr>
                             <th colspan="6">
                                 A rendszerbe felvett felhasználók
@@ -228,6 +229,9 @@
                             <th>ID</th>
                             <th>Név</th>
                             <th>E-mail cím</th>
+                            <th>Szerepe</th>
+                            <th>Tantárgy</th>
+                            <th>Szín</th>
                             <th>&nbsp;</th>
                             <th>&nbsp;</th>
                         </tr>
@@ -238,6 +242,9 @@
                             <td><?=$felhasznalok[$i]["id"]?></td>
                             <td><?=$felhasznalok[$i]["nev"]?></td>
                             <td><?=$felhasznalok[$i]["email"]?></td>
+                            <td><?=$felhasznalok[$i]["szerep"]?></td>
+                            <td><?=$felhasznalok[$i]["tantargy"]?></td>
+                            <td style="background-color : #<?=$felhasznalok[$i]["szin"]?>;"></td>
                             <td><input type="button" name="modosit" id="modosit_<?=$felhasznalok[$i]["id"]?>" class="felhasznalo_modosit_gomb" value="Módosítás"></td>
                             <td><input type="button" name="torol" id="torol_<?=$felhasznalok[$i]["id"]?>" class="felhasznalo_torol_gomb" value="Törlés"></td>
                         </tr>
