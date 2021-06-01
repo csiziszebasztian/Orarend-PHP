@@ -102,7 +102,7 @@
             }
             else
             {
-                throw new \Exception("Nem sikerült létrehozni az SQL kifejezést.");
+                throw new \Exception("Nem sikerült létrehozni az SQL kifejezést. ");
             }
         }
 
@@ -115,11 +115,11 @@
                 //Ha van megadva jelszó, akkor azt is módosítjuk, ha nem adtak meg, akkor ahhoz nem nyúlunk
                 $jelszo_sql = "" ;
                 if ($this->password != "") {
-                    $jelszo_sql = ", jelszo = '" . password_hash($this->password, PASSWORD_DEFAULT) . "'" ;
+                    $jelszo_sql = ", jelszo = '" . password_hash($this->password, PASSWORD_DEFAULT) . "'," ;
                 }
                 $sql = "update felhasznalok set nev = ?, email = ? " . $jelszo_sql . " szerep=?, tantargy=?, szin=? where id = ?" ;
                 if ($query = $mysqli->prepare($sql)) {
-                    $query->bind_param("ssssi", $this->name, $this->email, $this->role, $this->subject, $this->color, $this->id);
+                    $query->bind_param("sssssi", $this->name, $this->email ,$this->role, $this->subject, $this->color, $this->id);
                     if(!$query->execute()) {
                         throw new \Exception("Felhasználó adatok frissítése sikertelen.");
                     }

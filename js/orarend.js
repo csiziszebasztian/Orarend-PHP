@@ -1,13 +1,47 @@
 
-//kész
+
+
+//Felhasználó mezők váltása
+//Kész
 $(document).ready(function() {
   $("#szerep_select").on("change", function() {
     $(".plusz_mezok").hide() ;
     if ($(this).val()==="tanár") {
       $(".tanar_mezok").show();
     }
-  }) ;
+  });
   
+//Felhasználó törlése
+//Kész
+$(document).on("click", ".felhasznalo_torol_gomb", function() {
+  var torles_id = $(this).attr("id") ;
+  torles_id = torles_id.substring(torles_id.indexOf("_") + 1) ;
+  $.ajax({
+    method: "POST",
+    url: "users.php",
+    data: { felhasznalo_id: torles_id, felhasznalo_torles: 1 },
+  })
+  .done(function(valasz) {
+    if (valasz == "sikeres_torles") {
+      $("#felhasznalo_valaszuzenet").addClass("sikeruzenet").html("Sikeres törlés").show( "slow" ).delay( 3000 ).fadeOut().removeClass(function() {
+        $("#felhasznalo_valaszuzenet").removeClass("sikeruzenet").html();          
+        $("#felhasznalo_modosito_urlap_befoglalo").delay( 3000 ).hide("slow") ; 
+      }) ;
+      felhasznalo_kereses() ;
+    }
+    else
+    {
+      $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
+    }
+  })
+  .fail(function() {
+    $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html("Sikertelen küldés").show( "slow" );
+  })
+}) ;
+
+
+// Felhasználó módosítása 
+//kész
   $(document).on("click", ".felhasznalo_modosit_gomb", function() {
     var modositas_id = $(this).attr("id") ;
     modositas_id = modositas_id.substring(modositas_id.indexOf("_") + 1) ;
@@ -21,6 +55,13 @@ $(document).ready(function() {
       $("#felhasznalo_modositas_id_hidden").val(modositas_id) ;
       $("#felhasznalo_modositas_nev_input").val(valasz[0].nev) ;
       $("#felhasznalo_modositas_email_input").val(valasz[0].email) ;
+      $("#felhasznalo_modositas_szerep_select").attr('disabled', 'disabled');
+      $("#felhasznalo_modositas_szerep_select").val(valasz[0].szerep) ;
+      if(valasz[0].szerep==="tanár"){
+        $(".modosito_tanar_mezok").show();
+        $("#modosito_tantargy_input").val(valasz[0].tantargy) ;
+        $("#modosito_szin_input").val("#" + valasz[0].szin);
+      }
       $("#felhasznalo_modositas_jelszo_input").val("") ;
       $("#felhasznalo_modositas_jelszo_ismet_input").val("") ;
       $("#felhasznalo_modosito_urlap_befoglalo").show("slow") ;
@@ -30,31 +71,60 @@ $(document).ready(function() {
     })  
   }) ;
 
-  $(document).on("click", ".felhasznalo_torol_gomb", function() {
-    var torles_id = $(this).attr("id") ;
-    torles_id = torles_id.substring(torles_id.indexOf("_") + 1) ;
+//Felhasznaló mentés gomb
+//Kész
+  $("#felhasznalo_mentes_gomb").on("click", function() {
+    $("#felhasznalo_valaszuzenet").hide().removeClass("sikeruzenet").html() ;
     $.ajax({
-      method: "POST",
-      url: "users.php",
-      data: { felhasznalo_id: torles_id, felhasznalo_torles: 1 },
+        method: "POST",
+        url: "users.php",
+        data: $('#felhasznalo_felveteli_urlap').serialize()
     })
     .done(function(valasz) {
-      if (valasz == "sikeres_torles") {
-        $("#felhasznalo_valaszuzenet").addClass("sikeruzenet").html("Sikeres törlés").show( "slow" ).delay( 3000 ).fadeOut().removeClass(function() {
-          $("#felhasznalo_valaszuzenet").removeClass("sikeruzenet").html();          
-          $("#felhasznalo_modosito_urlap_befoglalo").delay( 3000 ).hide("slow") ; 
-        }) ;
-        felhasznalo_kereses() ;
-      }
-      else
-      {
-        $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
-      }
+        if (valasz == "sikeres_mentes") {
+          $("#felhasznalo_valaszuzenet").addClass("sikeruzenet").html("Sikeres mentés").show( "slow" ).delay( 3000 ).fadeOut();
+          $("#felhasznalo_felveteli_urlap").trigger('reset') ;
+          felhasznalo_kereses() ;
+        }
+        else
+        {
+          $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
+        }
     })
     .fail(function() {
       $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html("Sikertelen küldés").show( "slow" );
     })
+    $("#felhasznalo_valaszuzenet").removeClass("sikeruzenet").html();
   }) ;
+
+//Felhasznaló modosítás mentés
+//Kész
+  $("#felhasznalo_modositas_mentes_gomb").on("click", function() {
+    $("#felhasznalo_valaszuzenet").hide().removeClass("sikeruzenet").html() ;
+    $.ajax({
+        method: "POST",
+        url: "users.php",
+        data: $('#felhasznalo_modositas_urlap').serialize()
+    })
+    .done(function(valasz) {
+        if (valasz == "sikeres_mentes") {
+          $("#felhasznalo_modositas_urlap").trigger('reset') ;
+          $("#felhasznalo_valaszuzenet").addClass("sikeruzenet").html("Sikeres mentés").show( "slow" ).delay( 3000 ).fadeOut().removeClass(function() {            
+            $("#felhasznalo_modosito_urlap_befoglalo").delay( 3000 ).hide("slow") ; 
+          }) ;
+          felhasznalo_kereses() ;
+        }
+        else
+        {
+          $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
+        }
+    })
+    .fail(function() {
+      $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html("Sikertelen küldés").show( "slow" );
+    })
+    $("#felhasznalo_valaszuzenet").removeClass("sikeruzenet").html();
+  }) ;  
+
 
   $(document).on("click", ".kiadvany_modosit_gomb", function() {
     var modositas_id = $(this).attr("id") ;
@@ -160,55 +230,7 @@ $(document).ready(function() {
       $("#kiadvany_valaszuzenet").removeClass("sikeruzenet").html();
   }) ;
 
-  $("#felhasznalo_mentes_gomb").on("click", function() {
-    $("#felhasznalo_valaszuzenet").hide().removeClass("sikeruzenet").html() ;
-    $.ajax({
-        method: "POST",
-        url: "users.php",
-        data: $('#felhasznalo_felveteli_urlap').serialize()
-    })
-    .done(function(valasz) {
-        if (valasz == "sikeres_mentes") {
-          $("#felhasznalo_valaszuzenet").addClass("sikeruzenet").html("Sikeres mentés").show( "slow" ).delay( 3000 ).fadeOut();
-          $("#felhasznalo_felveteli_urlap").trigger('reset') ;
-          felhasznalo_kereses() ;
-        }
-        else
-        {
-          $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
-        }
-    })
-    .fail(function() {
-      $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html("Sikertelen küldés").show( "slow" );
-    })
-    $("#felhasznalo_valaszuzenet").removeClass("sikeruzenet").html();
-  }) ;
-
-  $("#felhasznalo_modositas_mentes_gomb").on("click", function() {
-    $("#felhasznalo_valaszuzenet").hide().removeClass("sikeruzenet").html() ;
-    $.ajax({
-        method: "POST",
-        url: "users.php",
-        data: $('#felhasznalo_modositas_urlap').serialize()
-    })
-    .done(function(valasz) {
-        if (valasz == "sikeres_mentes") {
-          $("#felhasznalo_modositas_urlap").trigger('reset') ;
-          $("#felhasznalo_valaszuzenet").addClass("sikeruzenet").html("Sikeres mentés").show( "slow" ).delay( 3000 ).fadeOut().removeClass(function() {            
-            $("#felhasznalo_modosito_urlap_befoglalo").delay( 3000 ).hide("slow") ; 
-          }) ;
-          felhasznalo_kereses() ;
-        }
-        else
-        {
-          $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
-        }
-    })
-    .fail(function() {
-      $("#felhasznalo_valaszuzenet").addClass("hibauzenet").html("Sikertelen küldés").show( "slow" );
-    })
-    $("#felhasznalo_valaszuzenet").removeClass("sikeruzenet").html();
-  }) ;  
+  
 
   $("#kereses_gomb").on("click", function() {
     kereses() ;
@@ -252,9 +274,12 @@ function felhasznalo_kereses() {
     dataType: "json"
   })
   .done(function(valasz) {
+    console.log(valasz);
     $("#felhasznalok_lista").html('<table class="list"><tr><th colspan="6">A rendszerbe felvett felhasználók</th></tr><tr><th>ID</th><th>Név</th><th>E-mail cím</th><th>Szerepe</th><th>Tantárgy</th><th>Szín</th><th>&nbsp;</th><th>&nbsp;</th></tr>')
     $.each(valasz,function(index,felhasznalo){
-      $("#felhasznalok_lista").find("table").append('<tr><td>' + felhasznalo.id + '</td><td>' + felhasznalo.nev + '</td><td>' + felhasznalo.email + '</td><td>' + felhasznalo.role + '</td><td>' + '</td><td>' + felhasznalo.subject + '</td><td>' + '</td><td>' + felhasznalo.color + '</td><td>' + '</td><td><input type="button" name="modosit" id="modosit_' + felhasznalo.id + '" class="felhasznalo_modosit_gomb" value="Módosítás"></td><td><input type="button" name="torol" id="torol_' + felhasznalo.id + '" class="felhasznalo_torol_gomb" value="Törlés"></td></tr>') ;
+      if(felhasznalo.tantargy===null) felhasznalo.tantargy="";
+      if(felhasznalo.szin===null) felhasznalo.szin="";
+      $("#felhasznalok_lista").find("table").append('<tr><td>' + felhasznalo.id + '</td><td>' + felhasznalo.nev + '</td><td>' + felhasznalo.email + '</td><td>' + felhasznalo.szerep + '</td><td>' + felhasznalo.tantargy + '</td><td style="background-color:  #' + felhasznalo.szin + '  "> </td><td><input type="button" name="modosit" id="modosit_' + felhasznalo.id + '" class="felhasznalo_modosit_gomb" value="Módosítás"></td><td><input type="button" name="torol" id="torol_' + felhasznalo.id + '" class="felhasznalo_torol_gomb" value="Törlés"></td></tr>') ;
     })
   })
 }

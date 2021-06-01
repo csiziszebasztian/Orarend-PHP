@@ -1,5 +1,4 @@
 <?php
-    ini_set('display_errors', 1);
     require_once("include/common_include.php") ;
 
     if (filter_has_var(INPUT_POST, 'felhasznalo_felvetel') && $_POST["felhasznalo_felvetel"] == "1") {
@@ -51,7 +50,7 @@
             die($hibauzenet) ;
         }
     }
-    /*else if (filter_has_var(INPUT_POST, 'felhasznalo_modositas') && $_POST["felhasznalo_modositas"] == "1") {
+    else if (filter_has_var(INPUT_POST, 'felhasznalo_modositas') && $_POST["felhasznalo_modositas"] == "1") {
         //Megpróbáljuk módosítani a felhasználót és visszaadjuk az üzenetet a sikerességről
         $hibauzenet = "" ;
         //Megpróbáljuk felvenni a felhasználót és visszaadjuk az üzenetet a sikerességről
@@ -84,12 +83,18 @@
         }
         if ($hibauzenet == "") {
             try {
-                    $felhasznalo = new nep\Felhasznalo("", "", "", $felhasznalo_id);
-                    $felhasznalo->setNev($felhasznalo_nev) ;
+                    $felhasznalo_subject = filter_input(INPUT_POST, "tantargy") ;
+                    $felhasznalo_color = substr(filter_input(INPUT_POST, "szin"), 1) ;
+                    $felhasznalo = new nep\Felhasznalo("", "", "","", "", "", $felhasznalo_id);
+                    $felhasznalo->setName($felhasznalo_nev) ;
                     $felhasznalo->setEmail($felhasznalo_email) ;
                     if ($felhasznalo_jelszo != "") {
                         $felhasznalo->setPassword($felhasznalo_jelszo) ;
                     }
+                    if($felhasznalo_subject!==""){
+                        $felhasznalo->setSubject($felhasznalo_subject);
+                        $felhasznalo->setColor($felhasznalo_color);
+                    } 
                     $felhasznalo->mentes() ;
             }
             catch (Exception $e) {
@@ -107,12 +112,13 @@
     else if (filter_has_var(INPUT_POST, 'felhasznalo_torles') && $_POST["felhasznalo_torles"] == "1") {
         //Megpróbáljuk törölni a felhasználót és visszaadjuk az üzenetet a sikerességről
         $hibauzenet = "" ;
+
         if (!filter_has_var(INPUT_POST, "felhasznalo_id") || !$felhasznalo_id = filter_input(INPUT_POST, "felhasznalo_id")) {
             $hibauzenet .= "Nincs felhasználó ID.<br />" ;
         }
         if ($hibauzenet == "") {
             try {
-                    $felhasznalo = new nep\Felhasznalo("", "", "", $felhasznalo_id);
+                    $felhasznalo = new nep\Felhasznalo("", "", "","","","", $felhasznalo_id);
                     $felhasznalo->torles() ;
             }
             catch (Exception $e) {
@@ -126,7 +132,7 @@
         {
             die($hibauzenet) ;
         }        
-    }*/
+    }
     else if (filter_has_var(INPUT_POST, 'felhasznalo_kereses') && $_POST["felhasznalo_kereses"] == "1") {
         if (filter_has_var(INPUT_POST, 'id')) {
             $keresett_id = filter_input(INPUT_POST, "id") ;
@@ -146,7 +152,7 @@
 <html>
     <head>
         <title>
-            Órarend alkalmazás
+            Órarend alkalmazás :: Felhasználók kezelése
         </title>
         <meta charset="utf-8" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -188,7 +194,7 @@
                             Tantárgy: <input type="text" name="tantargy" id="tantargy_input" value="" />
                         </div>
                         <div class="input_mezo plusz_mezok tanar_mezok" style="display:none;">
-                            Szín: <input type="color" name="szin" id="szin_input" value="#e66465" />
+                            Szín: <input type="color" name="szin" id="szin_input" value="" />
                         </div>
                         <input type="button" name="mentes" id="felhasznalo_mentes_gomb" value="Mentés">   
                     </form>
@@ -211,6 +217,20 @@
                         </div>
                         <div class="input_mezo">
                             Jelszó ismét: <input type="password" name="jelszo_ismet" id="felhasznalo_modositas_jelszo_ismet_input" value="" required />*
+                        </div>
+                        <div class="input_mezo">
+                            Szerepe: 
+                            <select name="szerep" id="felhasznalo_modositas_szerep_select">
+                                <option value="">Kérem, válasszon</option>
+                                <option value="tanár">Tanár</option>
+                                <option value="diák">Diák</option>
+                            </select>
+                        </div>
+                        <div class="input_mezo plusz_mezok modosito_tanar_mezok"  style="display:none;">
+                            Tantárgy: <input type="text" name="tantargy" id="modosito_tantargy_input" value="" />
+                        </div>
+                        <div class="input_mezo plusz_mezok modosito_tanar_mezok"  style="display:none;">
+                            Szín: <input type="color" name="szin" id="modosito_szin_input" value="" />
                         </div>
                         <input type="button" name="mentes" id="felhasznalo_modositas_mentes_gomb" value="Mentés">   
                     </form>
