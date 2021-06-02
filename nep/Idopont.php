@@ -5,7 +5,6 @@
     
     class Idopont {
         private $id;
-        private $tanarID;
         private $dateTime;
         private $text;
         private $file;
@@ -41,7 +40,7 @@
 
 
         
-        public function __construct( $dateTiem, $text=null, $file=null, $id = null) 
+        public function __construct(string $dateTime, string $text=null, string $file=null, int $id = null) 
         {
             if (is_numeric($id)) {
                 $this->id = $id ;
@@ -63,12 +62,12 @@
                 $query->execute() ;
                 $query->store_result();
                 if($query->num_rows > 0) {
-                    $query->bind_result($this->name, $this->email, $this->role, $this->subject, $this->szin);
+                    $query->bind_result($this->idopont, );
                     $query->fetch();
                 }
                 else
                 {
-                    throw new \Exception("Nem található felhasználó az adatbázisban ezzel az azonosítóval.");
+                    throw new \Exception("Nem található időpont az adatbázisban ezzel az azonosítóval.");
                 }
                 $query->close() ;
             }
@@ -78,22 +77,15 @@
             }
         }
 
-        //Felhasználó adatok mentése
-        public function mentes() {
+        public function mentes(int $tanarID) {
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            //Ha ismert volt az ID, akkor update, ha nem, akkor insert
             if (isset($this->id)) {
-                //Ha van megadva jelszó, akkor azt is módosítjuk, ha nem adtak meg, akkor ahhoz nem nyúlunk
-                $jelszo_sql = "" ;
-                if ($this->password != "") {
-                    $jelszo_sql = ", jelszo = '" . password_hash($this->password, PASSWORD_DEFAULT) . "'," ;
-                }
-                $sql = "update felhasznalok set nev = ?, email = ? " . $jelszo_sql . " szerep=?, tantargy=?, szin=? where id = ?" ;
+                $sql = "update idopontok set idopont = ?, tanar_id=? , leiras = ?,  csatolmany=? where id = ?" ;
                 if ($query = $mysqli->prepare($sql)) {
-                    $query->bind_param("sssssi", $this->name, $this->email ,$this->role, $this->subject, $this->color, $this->id);
+                    $query->bind_param("sissi", $this->dateTime, $tanarID, $this->text, $this->file, $this->id);
                     if(!$query->execute()) {
-                        throw new \Exception("Felhasználó adatok frissítése sikertelen.");
+                        throw new \Exception("Időpont adatok frissítése sikertelen.");
                     }
                     $query->close() ;
                 }
@@ -104,11 +96,10 @@
             }
             else
             {
-                if ($query = $mysqli->prepare("insert into felhasznalok (nev, email, jelszo, szerep, tantargy, szin) values (?, ?, ?, ?, ?, ?)")) {
-                    $jelszo_kodolt = password_hash($this->password, PASSWORD_DEFAULT) ;
-                    $query->bind_param("ssssss", $this->name, $this->email, $jelszo_kodolt, $this->role, $this->subject, $this->color);
+                if ($query = $mysqli->prepare("insert into idopontok (idopont, tanar_id, leiras, csatolmany) values (?, ?, ?, ?)")) {
+                    $query->bind_param("siss", $this->dateTime, $tanarID,$this->text, $this->file);
                     if(!$query->execute()  || $query->affected_rows == 0) {
-                        throw new \Exception("Felhasználó felvétele sikertelen.");
+                        throw new \Exception("Időpont felvétele sikertelen.");
                     }
                     $query->close() ;
                 }
@@ -119,128 +110,46 @@
             }
         }
         
-        //Felhasználó törlése a rendszerből
+
         public function torles() {
-            //Csak akkor futhat le, ha ID van benne, és a bejelentkezett felhasználó nem a törlendő felhasználó
-            //Ha valamelyikkel gond van, hibaüzenetet küldeni róla
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            //Ha ismert volt az ID, akkor update, ha nem, akkor insert
             if (isset($this->id)) {
-                if ($this->id != $_SESSION["belepett_user"]->getID()) {
-                    if ($query = $mysqli->prepare("delete from felhasznalok where id = ?")) {    
+                    if ($query = $mysqli->prepare("delete from idopontok where id = ?")) {    
                         $query->bind_param("i", $this->id);
                         if(!$query->execute()  || $query->affected_rows == 0) {
-                            throw new \Exception("Felhasználó törlése sikertelen.");
+                            throw new \Exception("Időpont törlése sikertelen.");
                         }
                         $query->close() ;
                     }
-                }
-                else
-                {
-                    throw new \Exception("A felhasználó nem törölheti saját magát.");    
-                }
+                
             }
             else
             {
-                throw new \Exception("Nincs megadva felhasználó azonosító.");
+                throw new \Exception("Nincs megadva időpont azonosító.");
             }
 
         }
                 
         public function __toString() : string {
-            $str = "<pre>Name: ".$this->name.
-                   "\nE-mail: ".$this->email.
-                   "\nRole: ". $this->role. 
-                   "\nSubject: ". $this->subject. 
-                   "\nColor: ". $this->color;
+            $str = "<pre>Időpont: ".$this->dateTime.
+                   "\nLeírás: ". $this->text.
+                   "\nCsatolmány: ". $this->file;
             $str .= "</pre>\n";
             return $str;
         }
 
-       
-        public static function emailFoglaltsagEllenorzes(string $email, int $felhasznalo_id = null) {
-            $return = false ;
-            $db = \MySqliDB::getInstance();
-            $mysqli = $db->getConnection(); 
-            $id_where = "" ;
-            if (is_numeric($felhasznalo_id)) {
-                $id_where = " and id != '" . $felhasznalo_id . "'";
-            }
-            if ($query = $mysqli->prepare("select id from felhasznalok where email = ?" . $id_where)) {       
-                $query->bind_param("s", $email);
-                $query->execute() ;
-                $query->store_result();
-                if($query->num_rows > 0)
-                    $return = true ;
-                $query->close() ;
-            }
-            else
-            {
-                throw new \Exception("Nem sikerült létrehozni az SQL kifejezést.");
-            }
-            return $return ;
-        }
-
-        //A rendszerbe felvett felhasználók listáját adja vissza
-        public static function felhasznalokListaja(array $keresesi_opciok = null) {
+        public static function IdopontokListaja(int $tanarID) {
             $return = array() ;
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            $where_query = "" ;
-            if (is_array($keresesi_opciok)) {
-                $where_query = "where 1 = 1 " ;                
-                foreach ($keresesi_opciok as $opcio_name => $opcio_ertek) {                    
-                    switch ($opcio_name) {
-                        case "id": 
-                            $where_query .= " and $opcio_name = $opcio_ertek " ;
-                            break ;
-                    }                    
-                }
-            }
-            if ($result = $mysqli->query("select id, nev, email, szerep, tantargy, szin from felhasznalok " . $where_query . " order by nev")) {
+
+            if ($result = $mysqli->query("select idopont, csatolmany, leiras from idopontok where id=". $tanarID. " order by idopont")) {
                 while ($sor = $result->fetch_assoc()) {
                     $return[] = $sor ;
                 }
                 $result->close() ;
             }
-            return $return ;
+            return $return;
         }
-
-        //Belépteti az e-mail + jelszónak megfelelő felhasználót a rendszerbe
-        //A visszatérési érték egy string, amely akkor üres, ha sikerült a beléptetés. Ha nem üres, akkor hibaüzenetet tartalmaz.
-        public static function bejelentkezes($felhasznalo_email, $felhasznalo_jelszo) {
-            $return = "" ;
-            $db = \MySqliDB::getInstance();
-            $mysqli = $db->getConnection(); 
-            if ($query = $mysqli->prepare("select id, nev, jelszo, szerep, tantargy, szin from felhasznalok where email = ?")) {
-                $query->bind_param("s", $felhasznalo_email);
-                $query->execute() ;
-                $query->store_result();
-                if($query->num_rows > 0) {                    
-                    $query->bind_result($id, $name, $jelszo_hash, $role, $subject, $szin);
-                    $query->fetch() ;
-                    if (password_verify($felhasznalo_jelszo, $jelszo_hash)) {    
-                        $user = new Felhasznalo($name, $felhasznalo_email, $felhasznalo_jelszo, $role, $subject, $szin, $id) ;
-                        $_SESSION["belepett_user"] = $user ;
-                        $return = "" ;
-                    }
-                    else
-                    {
-                        $return = "Nem stimmel a jelszó." ;
-                    }
-                }
-                else
-                {
-                    $return = "Nincs felhasználó a rendszerben ezzel az e-mail címmel." ;
-                }
-                $query->close() ;
-            }
-            else
-            {
-                $return = "Nem sikerült létrehozni az SQL kifejezést." ;
-            }
-            return $return ;
-        }
-
-    }
+}
