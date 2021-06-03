@@ -1,8 +1,3 @@
-
-
-
-//Felhasználó mezők váltása
-//Kész
 $(document).ready(function() {
   $("#szerep_select").on("change", function() {
     $(".plusz_mezok").hide() ;
@@ -283,3 +278,128 @@ function felhasznalo_kereses() {
     })
   })
 }
+
+
+
+//#####################################################################################
+//Időpntok
+
+$(document).ready(function() {
+
+
+
+/*$("#Idopont_mentes_gomb").on("click", function() {
+  $("#Idopont_valaszuzenet").hide().removeClass("sikeruzenet").html() ;
+  $.ajax({
+      method: "POST",
+      url: "orarendkezel.php",
+      data: $('#Idopont_felveteli_urlap').serialize()
+  })
+  .done(function(valasz) {
+      if (valasz == "sikeres_mentes") {
+        $("#Idopont_valaszuzenet").addClass("sikeruzenet").html("Sikeres mentés").show( "slow" ).delay( 3000 ).fadeOut();
+        $("#Idopont_felveteli_urlap").trigger('reset') ;
+        idopont_kereses() ;
+      }
+      else
+      {
+        $("#Idopont_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
+      }
+  })
+  .fail(function() {
+    $("#Idopont_valaszuzenet").addClass("hibauzenet").html("Sikertelen küldés").show( "slow" );
+  })
+  $("#Idopont_valaszuzenet").removeClass("sikeruzenet").html();
+}) ;
+
+$(document).on("click", ".Idopont_torol_gomb", function() {
+  var torles_id = $(this).attr("id") ;
+  torles_id = torles_id.substring(torles_id.indexOf("_") + 1) ;
+  $.ajax({
+    method: "POST",
+    url: "orarendkezel.php",
+    data: { Idopont_id: torles_id, Idopont_torles: 1 },
+  })
+  .done(function(valasz) {
+    if (valasz == "sikeres_torles") {
+      $("#Idopont_valaszuzenet").addClass("sikeruzenet").html("Sikeres törlés").show( "slow" ).delay( 3000 ).fadeOut().removeClass(function() {
+        $("#Idopont_valaszuzenet").removeClass("sikeruzenet").html();          
+        $("#Idopont_modosito_urlap_befoglalo").delay( 3000 ).hide("slow") ; 
+      }) ;
+      idopont_kereses() ;
+    }
+    else
+    {
+      $("#Idopont_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
+    }
+  })
+  .fail(function() {
+    $("#Idopont_valaszuzenet").addClass("hibauzenet").html("Sikertelen küldés").show( "slow" );
+  })
+}) ;
+
+
+$(document).on("click", ".Idopont_modosit_gomb", function() {
+  var modositas_id = $(this).attr("id") ;
+  modositas_id = modositas_id.substring(modositas_id.indexOf("_") + 1) ;
+  $.ajax({
+    method: "POST",
+    url: "orarendkezel.php",
+    data: { id: modositas_id, Idopont_kereses: 1 },
+    dataType: "json"
+  })
+  .done(function(valasz) {
+    console.log(valasz);
+    //$("#Idopont_modositas_id_hidden").val(modositas_id) ;
+  })
+  .fail(function() {
+    alert( "Sikertelen küldés" );
+  })  
+}) ;
+
+
+
+
+
+$("#Idopont_modositas_mentes_gomb").on("click", function() {
+  $("#Idopont_valaszuzenet").hide().removeClass("sikeruzenet").html() ;
+  $.ajax({
+      method: "POST",
+      url: "orarendkezel.php",
+      data: $('#Idopont_modositas_urlap').serialize()
+  })
+  .done(function(valasz) {
+      if (valasz == "sikeres_mentes") {
+        $("#Idopont_modositas_urlap").trigger('reset') ;
+        $("#Idopont_valaszuzenet").addClass("sikeruzenet").html("Sikeres mentés").show( "slow" ).delay( 3000 ).fadeOut().removeClass(function() {            
+          $("#Idopont_modosito_urlap_befoglalo").delay( 3000 ).hide("slow") ; 
+        }) ;
+        idopont_kereses() ;
+      }
+      else
+      {
+        $("#Idopont_valaszuzenet").addClass("hibauzenet").html(valasz).show( "slow" );
+      }
+  })
+  .fail(function() {
+    $("#Idopont_valaszuzenet").addClass("hibauzenet").html("Sikertelen küldés").show( "slow" );
+  })
+  $("#Idopont_valaszuzenet").removeClass("sikeruzenet").html();
+}) ; */
+
+function idopont_kereses() {
+  $.ajax({
+    method: "POST",
+    url: "orarendkezel.php",
+    data: { Idopont_kereses: 1 },
+    dataType: "json"
+  })
+  .done(function(valasz) {
+    $("#Idopontk_lista").html('<table class="list"><tr><th colspan="6"><?=$_SESSION["belepett_user"]->getSubject();?></th></tr><tr><th>Időpont</th><th>Leírás</th><th>Csatolmány</th><th>&nbsp;</th><th>&nbsp;</th></tr>');
+    $.each(valasz,function(index,Idopont){
+      $("#Idopontk_lista").find("table").append('<tr><td>'  + Idopont.ido + '</td><td>' + Idopont.leiras + '</td><td>'  + '<a href="orarendkezel.php?idopont_id=<?php echo $Idopont["id"] ?>"><?=$Idopont["csatolmany"]?></a>'  + '</td><td><input type="button" name="modosit" id="modosit_' + Idopont.id + '" class="Idopont_modosit_gomb" value="Módosítás"></td><td><input type="button" name="torol" id="torol_' + Idopont.id + '" class="Idopont_torol_gomb" value="Törlés"></td></tr>') ;
+    })
+  })
+}
+
+}) ;

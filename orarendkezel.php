@@ -1,17 +1,17 @@
 <?php
-    declare(strict_types=1);
+    require_once("include/common_include.php") ;
+    ini_set('display_errors', 1);
+  
 
+   define("ID", $_SESSION["belepett_user"]->getID()) ;
 
-
-
-  function validateDate($date, $format = 'Y-m-d\TH:i') : bool 
+  function validateDate($date, $format = 'Y-m-d\TH:i')
   {
     $d = DateTime::createFromFormat($format, $date);
     return $d && $d->format($format) == $date;
   }
 
 
-    require_once("include/common_include.php") ;
     if (filter_has_var(INPUT_POST, 'Idopont_felvetel') && $_POST["Idopont_felvetel"] == "1") {
         $hibauzenet = "" ;
         if (!filter_has_var(INPUT_POST, "ido") || !$Idopont_ido = filter_input(INPUT_POST, "ido")) {
@@ -24,10 +24,11 @@
             try {
                     $Idopont_text =  filter_has_var(INPUT_POST, "leiras") ? filter_input(INPUT_POST, "leiras") : null ;
                     $Idopont_file =  !empty($_FILES["csatolmany"])  ?  $_FILES['csatolmany']['name'] : null;
-                    $Idopont_file = $_SESSION["belepett_user"]->getID() . "_" . $Idopont_file;
-                    $Idopont = new nep\Idopont($Idopont_ido, $Idopont_text, $Idopont_file);
-                    $Idopont->mentes($_SESSION["belepett_user"]->getID());
-                    nep\FileManagement::feltolt($_SESSION["belepett_user"]->getID());
+                    $Idopont = new nep\Idopont($Idopont_ido, ID ,$Idopont_text, $Idopont_file);
+                    $Idopont->mentes();
+                    if($Idopont_file!==null) {
+                        nep\FileManagement::feltolt(ID, $_FILES['csatolmany']);
+                    }
             }
             catch (Exception $e) {
                 $hibauzenet = $e->getMessage() ;
@@ -55,12 +56,15 @@
         if ($hibauzenet == "") {
             try {
                     $Idopont_text =  filter_has_var(INPUT_POST, "leiras") ?  filter_input(INPUT_POST, "leiras") : null;
-                    $Idopont_file =  filter_has_var(INPUT_POST, "csatolmany") ? filter_input(INPUT_POST, "csatolmany") : null;
-                    $Idopont = new nep\Idopont("", "", "", $Idopont_id);
+                    $Idopont_file =  !empty($_FILES["csatolmany"])  ?  $_FILES['csatolmany']['name'] : null;
+                    $Idopont = new nep\Idopont("", null ,"", "", $Idopont_id);
                     $Idopont->setDateTime($Idopont_dt);
                     $Idopont->setText($Idopont_text) ;
                     $Idopont->setFile($Idopont_file);
-                    $Idopont->mentes($_SESSION["belepett_user"]->getID()) ;
+                    $Idopont->mentes();
+                    if($Idopont_file!==null) {
+                        nep\FileManagement::torles(ID);
+                    }
             }
             catch (Exception $e) {
                 $hibauzenet = $e->getMessage() ;
@@ -81,8 +85,9 @@
         }
         if ($hibauzenet == "") {
             try {
-                    $Idopont = new nep\Idopont("","","", $Idopont_id);
+                    $Idopont = new nep\Idopont("", null ,"","", $Idopont_id);
                     $Idopont->torles();
+                    nep\FileManagement::torles($Idopont->getFile());
             }
             catch (Exception $e) {
                 $hibauzenet = $e->getMessage() ;
@@ -96,8 +101,37 @@
             die($hibauzenet) ;
         }        
     }
+
+
+    if (isset($_GET['idopont_id'])) { 
+        try {
+            $Idopont = new nep\Idopont("", null ,"","", $_GET['idopont_id']);
+            $fileName =  $Idopont->getFile();
+            nep\FileManagement::letolt($fileName);
+
+         }
+       catch (Exception $e) {
+           $hibauzenet = $e->getMessage() ;
+         }            
+      
+        if ($hibauzenet == "") {
+           die("sikeres_torles") ;
+        }
+        else{
+           die($hibauzenet) ;
+        }
     
-    $Idopontok = nep\Idopont::IdopontokListaja($_SESSION["belepett_user"]->getID()) ;
+    }
+
+
+    else if (filter_has_var(INPUT_POST, 'idopont_kereses') && $_POST["idopont_kereses"] == "1") {
+        $Idopontok = nep\Idopont::IdopontokListaja(ID);
+    }
+    else {
+        $Idopontok = nep\Idopont::IdopontokListaja(ID);
+    }
+
+   
 ?>
 
 <html>
@@ -108,6 +142,7 @@
         <meta charset="utf-8" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="js/orarend.js"></script>       
+        <script src="js/lap.js"></script>       
         <link rel='stylesheet' href="style/stilus.css" type='text/css' media='all' />     
     </head>
     <body>
@@ -115,11 +150,11 @@
     require_once("include/menu_include.php") ;    
 ?>
         <div class="content">
-            <p class="valaszuzenet" id="I_valaszuzenet"></p>
+            <p class="valaszuzenet" id="Idopont_valaszuzenet"></p>
             <div id="Idopont_felveteli_urlap_befoglalo">
                 <fieldset>
                     <legend>Időpont felvétele</legend>
-                    <form name="Idopont_felveteli_urlap" id="Idopont_felveteli_urlap">
+                    <form name="Idopont_felveteli_urlap" id="Idopont_felveteli_urlap" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>"enctype="multipart/form-data">
                         <input type="hidden" name="Idopont_felvetel" id="Idopont_felvetel_hidden" value="1">
                         <div class="input_mezo">
                             Időpont: <input type="datetime-local" name="ido" id="idopont_input" value="2021-09-01T00:00" min="2021-09-01T00:00" max="2021-12-10T23:00" required>*
@@ -130,14 +165,14 @@
                         <div class="input_mezo">
                             Csatolmány: <input type="file" name="csatolmany" id="csatolmany_input" >
                         </div>
-                        <input type="button" name="mentes" id="Idopont_mentes_gomb" value="Mentés">   
+                        <input type="submit" name="mentes" id="Idopont_mentes_gomb" value="Mentés">   
                     </form>
                 </fieldset>
             </div>
             <div id="Idopont_modosito_urlap_befoglalo" style="display:none;">
                 <fieldset>
                     <legend>Időpont adatok módosítása</legend>
-                    <form name="Idopont_modositas_urlap" id="Idopont_modositas_urlap">
+                    <form name="Idopont_modositas_urlap" id="Idopont_modositas_urlap" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>"enctype="multipart/form-data">
                         <input type="hidden" name="Idopont_modositas" id="Idopont_modositas_hidden" value="1">
                         <input type="hidden" name="Idopont_id" id="Idopont_modositas_id_hidden" value="">
                         <div class="input_mezo">
@@ -149,12 +184,12 @@
                         <div class="input_mezo">
                             Csatolmány: <input type="file" name="csatolmany" id="csatolmany_input" >
                         </div> 
-                        <input type="button" name="mentes" id="Idopont_modositas_mentes_gomb" value="Mentés">   
+                        <input type="submit" name="mentes" id="Idopont_modositas_mentes_gomb" value="Mentés">   
                     </form>
                 </fieldset>
             </div>
             <div>
-                <h3>Órák listája</h3>
+               <h3>Órák listája</h3>
                 <div id="Idopontk_lista">                                    
                     <table class="list">
                         <tr>
@@ -175,7 +210,7 @@
                         <tr>
                             <td><?=$Idopontok[$i]["idopont"]?></td>
                             <td><?=$Idopontok[$i]["leiras"]?></td>
-                            <td><?=$Idopontok[$i]["csatolmany"]?></td>
+                            <td><a href="orarendkezel.php?idopont_id=<?php echo $Idopont["id"] ?>"><?=$Idopont['csatolmany']?></a></td>
                             <td><input type="button" name="modosit" id="modosit_<?=$Idopontok[$i]["id"]?>" class="Idopont_modosit_gomb" value="Módosítás"></td>
                             <td><input type="button" name="torol" id="torol_<?=$Idopontok[$i]["id"]?>" class="Idopont_torol_gomb" value="Törlés"></td>
                         </tr>

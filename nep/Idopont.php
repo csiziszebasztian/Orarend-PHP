@@ -8,6 +8,7 @@
         private $dateTime;
         private $text;
         private $file;
+        private $ownerID;
 
         public function getID() : int {
             return $this->id;
@@ -24,6 +25,10 @@
         public function getFile() : string {
             return $this->file;
         }
+        
+        public function getOwnerID() : int {
+            return $this->ownerID;
+        }
     
 
         public function setDateTime(string $dateTime) {
@@ -38,9 +43,12 @@
             $this->file = $file;
         }
 
+        public function setOwnerID(int $ownerID) {
+            $this->ownerID = $ownerID;
+        }
 
         
-        public function __construct(string $dateTime, string $text=null, string $file=null, int $id = null) 
+        public function __construct(string $dateTime, int $ownerID=null, string $text=null, string $file=null, int $id = null) 
         {
             if (is_numeric($id)) {
                 $this->id = $id ;
@@ -48,21 +56,22 @@
             }
             else
             {
+                $this->ownerID = $ownerID;
                 $this->dateTime=$dateTime;
                 $this->text = $text;
-                $this->file = $file;
+                $this->file = $ownerID . "_" . $file;
             }
         }
 
         private function betolt() {
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
-            if ($query = $mysqli->prepare("select idopont, leiras, csatolmany from idopontok where id = ?")) {       
+            if ($query = $mysqli->prepare("select tanar_id, idopont, leiras, csatolmany from idopontok where id = ?")) {       
                 $query->bind_param("i", $this->id);
                 $query->execute() ;
                 $query->store_result();
                 if($query->num_rows > 0) {
-                    $query->bind_result($this->idopont, );
+                    $query->bind_result($this->ownerID, $this->dateTime, $this->text, $this->file);
                     $query->fetch();
                 }
                 else
@@ -77,13 +86,13 @@
             }
         }
 
-        public function mentes(int $tanarID) {
+        public function mentes() {
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
             if (isset($this->id)) {
                 $sql = "update idopontok set idopont = ?, tanar_id=? , leiras = ?,  csatolmany=? where id = ?" ;
                 if ($query = $mysqli->prepare($sql)) {
-                    $query->bind_param("sissi", $this->dateTime, $tanarID, $this->text, $this->file, $this->id);
+                    $query->bind_param("sissi", $this->dateTime, $this->ownerID, $this->text, $this->file, $this->id);
                     if(!$query->execute()) {
                         throw new \Exception("Időpont adatok frissítése sikertelen.");
                     }
@@ -97,7 +106,7 @@
             else
             {
                 if ($query = $mysqli->prepare("insert into idopontok (idopont, tanar_id, leiras, csatolmany) values (?, ?, ?, ?)")) {
-                    $query->bind_param("siss", $this->dateTime, $tanarID,$this->text, $this->file);
+                    $query->bind_param("siss", $this->dateTime, $this->ownerID ,$this->text, $this->file);
                     if(!$query->execute()  || $query->affected_rows == 0) {
                         throw new \Exception("Időpont felvétele sikertelen.");
                     }
@@ -144,7 +153,7 @@
             $db = \MySqliDB::getInstance();
             $mysqli = $db->getConnection(); 
 
-            if ($result = $mysqli->query("select idopont, csatolmany, leiras from idopontok where id=". $tanarID. " order by idopont")) {
+            if ($result = $mysqli->query("select id, idopont, csatolmany, leiras from idopontok where id=". $tanarID. " order by idopont")) {
                 while ($sor = $result->fetch_assoc()) {
                     $return[] = $sor ;
                 }

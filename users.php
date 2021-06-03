@@ -119,7 +119,8 @@
         if ($hibauzenet == "") {
             try {
                     $felhasznalo = new nep\Felhasznalo("", "", "","","","", $felhasznalo_id);
-                    $felhasznalo->torles() ;
+                    $felhasznalo->torles();
+                    nep\FileManagement::tanarTorles($felhasznalo->getID());
             }
             catch (Exception $e) {
                 $hibauzenet = $e->getMessage() ;
@@ -156,7 +157,8 @@
         </title>
         <meta charset="utf-8" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="js/orarend.js"></script>       
+        <script src="js/orarend.js"></script>  
+        <script src="js/lap.js"></script>      
         <link rel='stylesheet' href="style/stilus.css" type='text/css' media='all' />     
     </head>
     <body>
